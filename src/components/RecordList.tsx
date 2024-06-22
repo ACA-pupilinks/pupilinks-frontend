@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getRecords, Record, RecordsResponse } from '../services/pocketbase';
+import { List, ListItem, ListItemText, Typography, Box, Button, CircularProgress } from '@mui/material';
 
-const RecordList: React.FC = () => {
+const RecordList: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
   const [records, setRecords] = useState<Record[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const navigate = useNavigate();
 
   const fetchRecords = async () => {
     setLoading(true);
@@ -46,33 +49,23 @@ const RecordList: React.FC = () => {
     return <div>Error: {error}</div>;
   }
 
+  const handleLogout = () => {
+    onLogout();
+    navigate('/login');
+  };
+
   return (
-    <div>
-      <h2>Location Records</h2>
-      {records.length === 0 ? (
-        <p>No records found.</p>
-      ) : (
-        <ul>
-          {records.map((record) => (
-            <li key={record.id}>
-              {/* Adjust this based on your actual record structure */}
-              {record.name || `Record ${record.id}`}
-            </li>
-          ))}
-        </ul>
-      )}
-      <div>
-        <button onClick={handlePreviousPage} disabled={page === 1}>
-          Previous
-        </button>
-        <span>
-          Page {page} of {totalPages}
-        </span>
-        <button onClick={handleNextPage} disabled={page === totalPages}>
-          Next
-        </button>
-      </div>
-    </div>
+    <Box sx={{ maxWidth: 600, margin: 'auto', mt: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h4" component="h2">
+          Location Records
+        </Typography>
+        <Button onClick={handleLogout} variant="outlined">
+          Logout
+        </Button>
+      </Box>
+      {/* ... rest of your component */}
+    </Box>
   );
 };
 

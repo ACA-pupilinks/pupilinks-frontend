@@ -1,41 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import RecordList from './components/RecordList';
 import Login from './components/Login';
-import { apiClient } from './services/pocketbase';
+import MainLayout from './components/MainLayout';
+
+const theme = createTheme();
 
 const App: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const token = localStorage.getItem('pocketbase_token');
-    if (token) {
-      apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      setIsAuthenticated(true);
-    }
-  }, []);
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
 
   const handleLogin = () => {
     setIsAuthenticated(true);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('pocketbase_token');
-    delete apiClient.defaults.headers.common['Authorization'];
     setIsAuthenticated(false);
   };
 
   return (
-    <div>
-      <h1>PocketBase Records</h1>
-      {isAuthenticated ? (
-        <>
-          <RecordList />
-          <button onClick={handleLogout}>Logout</button>
-        </>
-      ) : (
-        <Login onLogin={handleLogin} />
-      )}
-    </div>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Router>
+        <Routes>
+          <Route element={<MainLayout />}>
+            <Route path="/login" element={
+              isAuthenticated ? <Navigate to="/records" /> : <Login onLogin={handleLogin} />
+            } />
+            <Route path="/records" element={
+              isAuthenticated ? <RecordList onLogout={handleLogout} /> : <Navigate to="/login" />
+            } />
+            <Route path="/" element={<Navigate to="/login" />} />
+          </Route>
+        </Routes>
+      </Router>
+    </ThemeProvider>
   );
 };
 

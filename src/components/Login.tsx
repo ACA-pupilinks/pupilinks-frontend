@@ -1,21 +1,24 @@
 // src/components/Login.tsx
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { TextField, Button, Typography, Box, Container } from '@mui/material';
 import { login } from '../services/pocketbase';
 
 const Login: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
       await login(email, password);
       setError(null);
-      onLogin(); // Notify parent component about successful login
+      onLogin();
+      navigate('/records');
     } catch (err) {
-      setError('Login failed. Please check your credentials.');
-      console.error('Error logging in:', err);
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
     }
   };
 
