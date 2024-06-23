@@ -1,22 +1,21 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { TextField, Button, Typography, Box, Container, Divider } from '@mui/material';
+import { TextField, Button, Typography, Box, Container, Tabs, Tab } from '@mui/material';
 import { Google as GoogleIcon } from '@mui/icons-material';
-import { login } from '../services/pocketbase';
+import { register } from '../services/pocketbase'; // Assume this function exists
 
-const Login: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
+const Register: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [userType, setUserType] = useState('inquilino');
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
-      await login(email, password);
-      setError(null);
-      onLogin();
-      navigate('/records');
+      await register(email, password, userType);
+      navigate('/login');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
     }
@@ -32,12 +31,20 @@ const Login: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
           alignItems: 'center',
         }}
       >
+        <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
+          Registrarse
+        </Typography>
+        <Tabs
+          value={userType}
+          onChange={(_, newValue) => setUserType(newValue)}
+          sx={{ mb: 2, width: '100%' }}
+        >
+          <Tab label="Inquilino" value="inquilino" sx={{ width: '50%' }} />
+          <Tab label="Propietario" value="propietario" sx={{ width: '50%' }} />
+        </Tabs>
         <Box sx={{ mb: 2, width: '100%', maxWidth: 250 }}>
           <img src="/images/logo.png" alt="PUP LINKS Logo" style={{ width: '100%', height: 'auto' }} />
         </Box>
-        <Typography variant="subtitle1" sx={{ mb: 2 }}>
-          Inicia seccion y empieza tu nueva experiencia
-        </Typography>
         <Button
           fullWidth
           variant="contained"
@@ -46,14 +53,14 @@ const Login: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
         >
           Iniciar sesión con Google
         </Button>
-        <Divider sx={{ width: '100%', mb: 2 }}>o</Divider>
+        <Typography variant="body2" sx={{ mb: 2 }}>o</Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
           <TextField
             margin="normal"
             required
             fullWidth
             id="email"
-            label="Dirección de correo electrónico"
+            label="Dirección de correo electronico"
             name="email"
             autoComplete="email"
             autoFocus
@@ -68,23 +75,20 @@ const Login: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
             label="Contraseña"
             type="password"
             id="password"
-            autoComplete="current-password"
+            autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <Typography variant="body2" sx={{ textAlign: 'right', mb: 2 }}>
-            <a href="#" style={{ color: 'inherit' }}>¿Has olvidado tu contraseña?</a>
-          </Typography>
           <Button
             type="submit"
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2, backgroundColor: '#8257e6', '&:hover': { backgroundColor: '#6f48c9' } }}
           >
-            Iniciar sesión
+            Registrarse
           </Button>
           <Typography variant="body2" sx={{ textAlign: 'center' }}>
-            ¿No tienes una cuenta? <Link to="/register" style={{ color: '#8257e6' }}>Regístrate aquí</Link>
+            <Link to="/login" style={{ color: '#8257e6' }}>Inicia sesión aquí</Link>
           </Typography>
         </Box>
       </Box>
@@ -97,4 +101,4 @@ const Login: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
   );
 };
 
-export default Login;
+export default Register;

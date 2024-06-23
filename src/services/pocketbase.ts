@@ -1,4 +1,3 @@
-// src/services/pocketbase.ts
 import axios, { AxiosInstance, AxiosError } from 'axios';
 
 const pocketBaseUrl = process.env.REACT_APP_POCKETBASE_URL;
@@ -19,6 +18,7 @@ export interface AuthResponse {
   user: {
     id: string;
     email: string;
+    userType: string;
     // Add other user fields as needed
   };
 }
@@ -26,6 +26,7 @@ export interface AuthResponse {
 export interface Record {
   id: string;
   name: string;
+  proposedPrice: number;
   // Add other record fields as needed
 }
 
@@ -51,6 +52,27 @@ export const login = async (email: string, password: string): Promise<AuthRespon
     if (axios.isAxiosError(error)) {
       const axiosError = error as AxiosError<{ message: string }>;
       throw new Error(axiosError.response?.data?.message || 'Login failed');
+    }
+    throw error;
+  }
+};
+
+export const register = async (email: string, password: string, userType: string): Promise<AuthResponse> => {
+  try {
+    const response = await apiClient.post<AuthResponse>('/api/collections/users/records', {
+      email,
+      password,
+      passwordConfirm: password, // PocketBase requires password confirmation
+      userType,
+    });
+    const { token, user } = response.data;
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    localStorage.setItem('pocketbase_token', token);
+    return { token, user };
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      throw new Error(axiosError.response?.data?.message || 'Registration failed');
     }
     throw error;
   }
