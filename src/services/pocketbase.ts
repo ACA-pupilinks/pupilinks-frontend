@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
+import { User } from '../types/user';
 
 const pocketBaseUrl = process.env.REACT_APP_POCKETBASE_URL;
 
@@ -38,16 +39,16 @@ export interface RecordsResponse {
   items: Record[];
 }
 
-export const login = async (email: string, password: string): Promise<AuthResponse> => {
+export const login = async (email: string, password: string): Promise<User> => {
   try {
-    const response = await apiClient.post<AuthResponse>('/api/collections/users/auth-with-password', {
+    const response = await apiClient.post<{ token: string; user: User }>('/api/collections/users/auth-with-password', {
       identity: email,
       password: password,
     });
     const { token, user } = response.data;
     apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     localStorage.setItem('pocketbase_token', token);
-    return { token, user };
+    return user;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const axiosError = error as AxiosError<{ message: string }>;
@@ -57,18 +58,18 @@ export const login = async (email: string, password: string): Promise<AuthRespon
   }
 };
 
-export const register = async (email: string, password: string, userType: string): Promise<AuthResponse> => {
+// export const register = async (email: string, password: string, userType: string): Promise<User> => {
+export const register = async (email: string, password: string): Promise<User> => {
   try {
-    const response = await apiClient.post<AuthResponse>('/api/collections/users/records', {
+    const response = await apiClient.post<{ token: string; user: User }>('/api/collections/users/records', {
       email,
       password,
-      passwordConfirm: password, // PocketBase requires password confirmation
-      userType,
+      passwordConfirm: password
     });
     const { token, user } = response.data;
     apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     localStorage.setItem('pocketbase_token', token);
-    return { token, user };
+    return user;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const axiosError = error as AxiosError<{ message: string }>;

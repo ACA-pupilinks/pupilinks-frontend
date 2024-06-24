@@ -9,8 +9,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import WcIcon from '@mui/icons-material/Wc';
 import PeopleIcon from '@mui/icons-material/People';
 
-// Add this constant at the top of your file
-const DEFAULT_IMAGE = '/images/default-image.jpg'; // Adjust the path as needed
+const DEFAULT_IMAGE = '/images/default-property.jpg';
 
 const RecordList: React.FC = () => {
   const [records, setRecords] = useState<Record[]>([]);

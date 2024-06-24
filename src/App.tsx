@@ -1,22 +1,32 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import RecordList from './components/RecordList';
 import Login from './components/Login';
 import Register from './components/Register';
 import MainLayout from './components/MainLayout';
+import { User } from './types/user';
 
 const theme = createTheme();
 
 const App: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
-  const handleLogin = () => {
-    setIsAuthenticated(true);
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  const handleLogin = (loggedInUser: User) => {
+    setUser(loggedInUser);
+    localStorage.setItem('user', JSON.stringify(loggedInUser));
   };
 
   const handleLogout = () => {
-    setIsAuthenticated(false);
+    setUser(null);
+    localStorage.removeItem('user');
   };
 
   return (
@@ -24,15 +34,10 @@ const App: React.FC = () => {
       <CssBaseline />
       <Router>
         <Routes>
-          <Route element={<MainLayout isAuthenticated={isAuthenticated} onLogout={handleLogout} />}>
-            <Route path="/login" element={
-              isAuthenticated ? <Navigate to="/records" /> : <Login onLogin={handleLogin} />
-            } />
-            <Route path="/register" element={<Register />} />
-            <Route path="/records" element={
-              isAuthenticated ? <RecordList /> : <Navigate to="/login" />
-            } />
-            <Route path="/" element={<Navigate to="/records" />} />
+          <Route element={<MainLayout user={user} onLogout={handleLogout} />}>
+            <Route path="/" element={<RecordList />} />
+            <Route path="/login" element={<Login onLogin={handleLogin} />} />
+            <Route path="/register" element={<Register onRegister={handleLogin} />} />
           </Route>
         </Routes>
       </Router>
