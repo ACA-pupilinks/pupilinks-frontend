@@ -1,11 +1,24 @@
 import React from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Container, Button, Box } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
+import { logout } from '../services/pocketbase'; // Import the logout function
 
-const MainLayout: React.FC = () => {
+interface MainLayoutProps {
+  isAuthenticated: boolean;
+  onLogout: () => void;
+}
+
+const MainLayout: React.FC<MainLayoutProps> = ({ isAuthenticated, onLogout }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const showNavbar = !['/login', '/register'].includes(location.pathname);
+
+  const handleLogout = () => {
+    logout();
+    onLogout();
+    navigate('/login');
+  };
 
   return (
     <>
@@ -16,12 +29,13 @@ const MainLayout: React.FC = () => {
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <img src="/images/logo.png" alt="PUP LINKS Logo" style={{ height: '40px', marginRight: '10px' }} />
                 <Button component={RouterLink} to="/contact" color="inherit">Contact us</Button>
-                <Button component={RouterLink} to="/list-property" color="inherit">List your property</Button>
+                <Button component={RouterLink} to="/list-property" color="inherit">Publica tu propiedad</Button>
               </Box>
-              <Box>
-                <Button component={RouterLink} to="/register" variant="contained" sx={{ mr: 2, bgcolor: '#8257e6' }}>Sign Up</Button>
-                <Button component={RouterLink} to="/login" variant="outlined" sx={{ color: '#8257e6', borderColor: '#8257e6' }}>Log in</Button>
-              </Box>
+              {isAuthenticated && (
+                <Box>
+                  <Button onClick={handleLogout} variant="outlined" sx={{ color: '#8257e6', borderColor: '#8257e6' }}>Logout</Button>
+                </Box>
+              )}
             </Toolbar>
           </Container>
         </AppBar>

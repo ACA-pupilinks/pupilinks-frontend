@@ -24,13 +24,13 @@ const App: React.FC = () => {
       <CssBaseline />
       <Router>
         <Routes>
-          <Route element={<MainLayout />}>
+          <Route element={<MainLayout isAuthenticated={isAuthenticated} onLogout={handleLogout} />}>
             <Route path="/login" element={
               isAuthenticated ? <Navigate to="/records" /> : <Login onLogin={handleLogin} />
             } />
             <Route path="/register" element={<Register />} />
             <Route path="/records" element={
-              isAuthenticated ? <RecordList onLogout={handleLogout} /> : <Navigate to="/login" />
+              isAuthenticated ? <RecordList /> : <Navigate to="/login" />
             } />
             <Route path="/" element={<Navigate to="/records" />} />
           </Route>
