@@ -9,11 +9,9 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import WcIcon from '@mui/icons-material/Wc';
 import PeopleIcon from '@mui/icons-material/People';
 
-interface RecordListProps {
-  onLogout: () => void;
-}
+const DEFAULT_IMAGE = '/images/default-property.jpg';
 
-const RecordList: React.FC<RecordListProps> = ({ onLogout }) => {
+const RecordList: React.FC = () => {
   const [records, setRecords] = useState<Record[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -65,7 +63,6 @@ const RecordList: React.FC<RecordListProps> = ({ onLogout }) => {
         <Typography variant="h4" component="h1">
           Buscas pupilaje, <span style={{ color: '#8257e6' }}>cuenta con nosotros par ayudarte</span>
         </Typography>
-        <Button onClick={onLogout} variant="outlined">Logout</Button>
       </Box>
       
       <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>

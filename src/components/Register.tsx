@@ -2,20 +2,27 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { TextField, Button, Typography, Box, Container, Tabs, Tab } from '@mui/material';
 import { Google as GoogleIcon } from '@mui/icons-material';
-import { register } from '../services/pocketbase'; // Assume this function exists
+import { register } from '../services/pocketbase';
+import { User } from '../types/user';
 
-const Register: React.FC = () => {
+interface RegisterProps {
+  onRegister: (user: User) => void;
+}
+
+const Register: React.FC<RegisterProps> = ({ onRegister }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [userType, setUserType] = useState('inquilino');
+  // const [userType, setUserType] = useState('inquilino');
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
-      await register(email, password, userType);
-      navigate('/login');
+      // const user = await register(email, password, userType);
+      const user = await register(email, password);
+      onRegister(user);
+      navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
     }
@@ -32,16 +39,16 @@ const Register: React.FC = () => {
         }}
       >
         <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
-          Registrarse
+          Regístrate
         </Typography>
-        <Tabs
+        {/* <Tabs
           value={userType}
           onChange={(_, newValue) => setUserType(newValue)}
           sx={{ mb: 2, width: '100%' }}
         >
           <Tab label="Inquilino" value="inquilino" sx={{ width: '50%' }} />
           <Tab label="Propietario" value="propietario" sx={{ width: '50%' }} />
-        </Tabs>
+        </Tabs> */}
         <Box sx={{ mb: 2, width: '100%', maxWidth: 250 }}>
           <img src="/images/logo.png" alt="PUP LINKS Logo" style={{ width: '100%', height: 'auto' }} />
         </Box>

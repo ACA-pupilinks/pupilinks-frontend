@@ -3,8 +3,13 @@ import { useNavigate, Link } from 'react-router-dom';
 import { TextField, Button, Typography, Box, Container, Divider } from '@mui/material';
 import { Google as GoogleIcon } from '@mui/icons-material';
 import { login } from '../services/pocketbase';
+import { User } from '../types/user';
 
-const Login: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
+interface LoginProps {
+  onLogin: (user: User) => void;
+}
+
+const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -13,10 +18,10 @@ const Login: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
-      await login(email, password);
+      const user = await login(email, password);
       setError(null);
-      onLogin();
-      navigate('/records');
+      onLogin(user);
+      navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
     }
